@@ -56,6 +56,7 @@ const Paragraph = styled.p`
 
 export default function Toggler(props){
     let [isActive,setActive] = React.useState(false);
+    let [isLoading,setLoading] = React.useState(true);
 
     let CurrentCircle = styled(Circle)`
         background-color:${isActive ? '#14f714':'#fff'};
@@ -68,6 +69,16 @@ export default function Toggler(props){
             console.log(e);
         })
         setActive(!isActive)
+    }
+
+    if(isLoading){
+        AjaxToTlg(props.url +'/getCurrentStateOfBot','GET').then((e)=>{
+            console.log(e);
+            e = JSON.parse(e.value);
+            setActive(e.isBotON);
+            setLoading(false);
+        })
+
     }
 
     return <>

@@ -61,7 +61,6 @@ export default function UserList(props){
         {usersWithTransactions.map((e,i)=>{
             function isObject(value){
                 let result = typeof value === 'object' && value !== null;
-                console.log(i,value,result);
                 return !result ? value : false;
 
             }
