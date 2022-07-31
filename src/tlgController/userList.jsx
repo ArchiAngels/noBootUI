@@ -1,23 +1,81 @@
 import React from "react";
 import styled from 'styled-components';
 
-const getUsers = require('../scripts/AjaxToTlg.js');
+import SuccesTransaction from "./SuccesTransaction.jsx";
+
+let UserInfo = styled.ol`
+    list-style-type: decimal-leading-zero;
+    font-size:1rem;
+    background-color:lightcoral;
+    border-radius:15px;
+    padding:1rem 3rem;
+    margin-bottom:1rem;
+    & li{
+        margin-bottom:4px;
+    }
+`;
+
+let HeaderInfo = styled.span`
+    font-weight:bold;
+    padding:0 2px;
+`;
+
+let ValueInfo = styled.span`
+    font-weight:medium;
+    padding:0 2px;
+`;
 
 function User(props){
     return <>
         <br/>
-        <br/>
-        <br/>
-        <p>{props.roomID}:</p>
-        <ol>
-            <li>name :{props.name}</li>
-            <li>surname :{props.surname}</li>
-            <li>email :{props.email}</li>
-
-            <li>possibleTransaction :{props.possibleTransaction}</li>
-            <li>acceptRules :{props.acceptRules}</li>
-            <li>fillFormState :{props.fillFormState}</li>
-        </ol>
+        <UserInfo>
+            <li>
+                <HeaderInfo>
+                    roomID
+                </HeaderInfo>
+                :
+                <ValueInfo>
+                    {props.roomID}
+                </ValueInfo>
+            </li>
+            <li>
+                <HeaderInfo>
+                    name
+                </HeaderInfo>
+                :
+                <ValueInfo>
+                    {props.name}
+                </ValueInfo>
+            </li>
+            <li>
+                <HeaderInfo>
+                    surname
+                </HeaderInfo>
+                :
+                <ValueInfo>
+                    {props.surname}
+                </ValueInfo>
+            </li>
+            <li>
+                <HeaderInfo>
+                    email
+                </HeaderInfo>
+                :
+                <ValueInfo>
+                    {props.email}
+                </ValueInfo>
+            </li>
+            <li>
+                <HeaderInfo>
+                    possibleTransaction
+                </HeaderInfo>
+                :
+                <ValueInfo>
+                    {props.possibleTransaction}
+                </ValueInfo>
+            </li>
+            <SuccesTransaction url={props.url} Ajax={props.Ajax} roomID={props.roomID}/>
+        </UserInfo>
     </>
 }
 
@@ -26,7 +84,8 @@ export default function UserList(props){
     let [isLoading,setLoading] = React.useState(false);
     let [fetchedData,setFetchedData] = React.useState({users:[]});
 
-    let usersWithTransactions = fetchedData.users.filter(e=> e.possibleTransaction) || [];
+    let usersWithTransactions = fetchedData.users.filter(e=> e.possibleTransaction && e.possibleTransaction.length > 0 && e.roomID) || [];
+    console.log(usersWithTransactions);
     React.useEffect(()=>{
         if(fetchedData.length === 0){
             // fetch auto mode
@@ -37,7 +96,7 @@ export default function UserList(props){
     })
 
     function HandleClick(){
-        let result = getUsers(props.url + '/userControl','GET');
+        let result = props.Ajax(props.url + '/userControl','GET');
             result.then((e)=>{
                 console.log(e);
                 setLoading(false);
@@ -58,6 +117,8 @@ export default function UserList(props){
 
         <p onClick = {HandleClick}>Get users</p>
 
+        <p>{usersWithTransactions ? 'Actually users: ' + usersWithTransactions.length : ''}</p>
+
         {usersWithTransactions.map((e,i)=>{
             function isObject(value){
                 let result = typeof value === 'object' && value !== null;
@@ -75,7 +136,11 @@ export default function UserList(props){
                 fillFormState :isObject(e.fillFormState) || 'no fillFormState',
 
             }
-            return <User 
+
+            if(userData.roomID === 'no room id'){
+                return ""
+            }else{
+                return <User 
                 name={userData.name}
                 surname ={userData.surname}
                 roomID={userData.roomID}
@@ -86,7 +151,12 @@ export default function UserList(props){
                 fillFormState={userData.fillFormState}
                 key={i}
 
+                Ajax={props.Ajax}
+                url={props.url}
+
             />
+            }
+            
         })}
     
     </>

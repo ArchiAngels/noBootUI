@@ -1,8 +1,6 @@
 import React from "react";
 import styled , {keyframes} from "styled-components";
 
-const AjaxToTlg = require('../scripts/AjaxToTlg.js');
-
 const ContainerItems = styled.div`
     padding:5px;
     background-color:#01e01e33;
@@ -65,14 +63,14 @@ export default function Toggler(props){
     `;
 
     function HandleClick(){
-        AjaxToTlg(props.url + '/TurnOnOffBot','GET').then(e=>{
+        props.Ajax(props.url + '/TurnOnOffBot','GET').then(e=>{
             console.log(e);
         })
         setActive(!isActive)
     }
 
     if(isLoading){
-        AjaxToTlg(props.url +'/getCurrentStateOfBot','GET').then((e)=>{
+        props.Ajax(props.url +'/getCurrentStateOfBot','GET').then((e)=>{
             console.log(e);
             e = JSON.parse(e.value);
             setActive(e.isBotON);
